@@ -1,4 +1,4 @@
-# Enterprise Business RAG Assistant
+# Business RAG Assistant — Grounded GenAI Q&A over Private Documents
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688.svg)](https://fastapi.tiangolo.com/)
@@ -7,20 +7,31 @@
 [![Embeddings](https://img.shields.io/badge/Embeddings-BAAI%2Fbge--small--en--v1.5-6366F1.svg)](https://huggingface.co/BAAI/bge-small-en-v1.5)
 [![Tests Passing](https://img.shields.io/badge/Tests-16%20Passed-emerald.svg)](https://docs.pytest.org/)
 
-An enterprise-grade **Retrieval-Augmented Generation (RAG)** assistant designed to answer employee questions strictly from private corporate documents (HR policies, travel limits, remote work guidelines, healthcare benefits, and IT security).
+A **Retrieval-Augmented Generation (RAG)** assistant that answers business and employee questions using private corporate documents such as HR policies, travel limits, remote work guidelines, healthcare benefits, and IT security.
 
-The system pairs **high-speed local vector search (FastEmbed + Qdrant HNSW)** with **Google Gemini (via the official `google-genai` SDK)** to formulate strictly grounded, verifiable answers with exact source citations and match confidence scores.
+The system combines **local semantic search (FastEmbed + Qdrant)** with **Google Gemini (via the official `google-genai` SDK)** to generate grounded answers with source citations and similarity scores.
+
+### How it works
+
+1. **Ingest documents** — business documents are loaded and split into smaller chunks.
+2. **Create embeddings** — each chunk is converted into a numerical embedding using FastEmbed.
+3. **Store vectors** — embeddings and document metadata are stored in Qdrant.
+4. **Retrieve context** — a user's question is embedded and Qdrant finds the most similar chunks.
+5. **Apply relevance gate** — weak matches below `MIN_SCORE` are rejected.
+6. **Generate an answer** — relevant chunks are passed to Gemini with a grounded system prompt.
+7. **Return sources** — the API returns the answer together with supporting document chunks and similarity scores.
+
 
 ---
 
 ## 🌟 Key Highlights
 
-- **Zero-Hallucination Guardrails:** A relevance threshold (`MIN_SCORE = 0.40`) drops weak matches. If no relevant policy exists, the system triggers an immediate refusal without calling the LLM—preventing hallucinations and saving 100% of LLM token costs.
-- **Prompt Injection Defense:** Strict system prompt isolation treats document context strictly as passive data, never as executable instructions.
+- **Hallucination-Resistant Guardrails:** A relevance threshold (`MIN_SCORE = 0.40`) drops weak matches. If no relevant policy is found, the system refuses to answer without calling the LLM.
+- **Prompt Injection Defense:** The system treats retrieved document content as data rather than instructions and explicitly tells the LLM not to follow instructions contained inside documents.
 - **Local Dense Embeddings:** Vectorization runs on CPU using `BAAI/bge-small-en-v1.5` via ONNX Runtime (`fastembed`). Zero external API latency, zero embedding cost, and complete document privacy.
-- **Embedded or Cloud Vector Database:** Runs locally with embedded Qdrant on disk (no Docker required), with 1-line configuration to scale to Qdrant Cloud.
+- **Local or Cloud Vector Database:** Runs locally with embedded Qdrant on disk (no Docker required), with configuration that can be adapted for Qdrant Cloud.
 - **Modern Glassmorphic UI:** Built-in web client featuring interactive document previews, live latency counters, confidence progress bars, and one-click copy.
-- **100% Offline Testability:** Comprehensive 16-test suite using an in-memory hash embedder and mock LLM clients, passing in ~8 seconds with no external API calls or internet needed.
+- **Offline Test Suite:** 16 unit and integration tests use a deterministic hash embedder and mocked LLM clients, so the core pipeline can be tested without external API calls.
 
 ---
 
@@ -89,9 +100,9 @@ We use the modern Google GenAI SDK (`google-genai`) running `gemini-3.5-flash-li
 
 ### 2. Multi-Provider & Extractive Fallback
 The system is model-agnostic:
-- **Google Gemini:** Primary high-speed, cost-effective provider.
-- **Anthropic Claude:** Easily activated by setting `LLM_PROVIDER=anthropic`.
-- **Extractive Fallback:** If no API key is provided or during third-party LLM outages, the pipeline automatically falls back to an extractive ranking algorithm, maintaining 100% uptime.
+- **Google Gemini:** Primary LLM provider.
+- **Anthropic Claude:** Supported as an alternative provider through `LLM_PROVIDER=anthropic`.
+- **Extractive Fallback:** If no API key is provided or the LLM is unavailable, the pipeline can fall back to an extractive response based on retrieved document content.
 
 ---
 
@@ -99,9 +110,9 @@ The system is model-agnostic:
 
 | Layer | Component | Rationale |
 |---|---|---|
-| **GenAI / LLM** | Google Gemini (`google-genai`) | High throughput, sub-second latency, low cost, generous free tier. |
+| **GenAI / LLM** | Google Gemini (`google-genai`) | Used for grounded answer generation after relevant document chunks are retrieved. |
 | **Embeddings** | `fastembed` (`BAAI/bge-small-en-v1.5`) | 384-dimensional dense vectors; runs locally on CPU via ONNX Runtime. Zero API costs. |
-| **Vector DB** | Qdrant (`qdrant-client`) | Production HNSW indexing, Cosine similarity metric, payload filtering, runs embedded on disk. |
+| **Vector DB** | Qdrant (`qdrant-client`) | HNSW indexing, Cosine similarity search, payload filtering, and embedded on-disk storage. |
 | **Backend API** | FastAPI + Uvicorn | Asynchronous, type-safe request validation (Pydantic v2), auto-generated Swagger UI. |
 | **Frontend** | Dark Glassmorphic UI | Tailwind CSS, Lucide icons, live document modal, confidence bars, latency timer. |
 | **Testing** | Pytest | 16 unit and integration tests with deterministic offline hash embedder. |
@@ -117,7 +128,7 @@ The system is model-agnostic:
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/business-rag-assistant.git
+git clone https://github.com/Kshitij1ghk/business-rag-assistant.git
 cd business-rag-assistant
 
 # Create virtual environment
@@ -257,6 +268,10 @@ business-rag-assistant/
 ```
 
 ---
+
+## 🎯 Why this project
+
+This project demonstrates practical GenAI application development rather than just calling an LLM API. It combines **RAG, embeddings, vector search, prompt grounding, FastAPI, testing, and a simple web UI** into one end-to-end application.
 
 ## 📄 License
 This project is licensed under the MIT License.
