@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+qdrant-client
+anthropic
+google-genai
+fastembed
+pytest
+httpx

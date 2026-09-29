@@ -1,0 +1,10 @@
+Acme Corp Expense Reimbursement Policy
+
+Submission: Expense claims must be submitted within 30 days of the purchase through the Finance portal. Receipts are required for every claim above 25 USD.
+
+Travel: Flights must be booked in economy class for trips under 6 hours. Business class is allowed only for flights longer than 6 hours and needs approval from a Director.
+Hotels: The hotel limit is 150 USD per night in standard cities and 220 USD per night in high-cost cities such as London, New York and Singapore.
+
+Meals: The daily meal allowance while travelling is 60 USD. Alcohol is not reimbursable.
+
+Approval: Claims up to 500 USD are approved by the direct manager. Claims above 500 USD also need Finance approval. Reimbursement is paid within 10 working days of approval.

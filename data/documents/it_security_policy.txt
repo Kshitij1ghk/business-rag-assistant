@@ -1,0 +1,10 @@
+Acme Corp IT Security Policy
+
+Passwords: Passwords must be at least 12 characters long and changed every 90 days. Password reuse across the last 5 passwords is not allowed.
+Multi-factor authentication: MFA is mandatory for email, VPN and all cloud systems.
+
+Devices: Company laptops must have full-disk encryption enabled. Personal devices may not store customer data.
+
+Incidents: Lost or stolen devices and suspected phishing must be reported to security@acme.example within 1 hour of discovery.
+
+Data classification: Customer data is classified as Confidential and may only be shared with approved vendors under a signed data processing agreement.
